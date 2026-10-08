@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 
 
-PROJECT_DIR = Path.home() / "Pictures" / "Research Work"
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 
 MODELS_DIR = PROJECT_DIR / "models"
 RESULTS_DIR = PROJECT_DIR / "results"
