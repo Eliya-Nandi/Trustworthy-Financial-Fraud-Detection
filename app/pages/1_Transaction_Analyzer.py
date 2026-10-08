@@ -16,10 +16,8 @@ PROJECT_DIR = Path(__file__).resolve().parents[2]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.append(str(PROJECT_DIR))
 
-#from src.prediction import analyze_transaction
 from src.prediction import analyze_transaction
 from src.explainability import explain_transaction
-
 
 # =========================================================
 # PAGE CONFIG
@@ -375,12 +373,20 @@ div[data-testid="stPlotlyChart"] {
 # LOAD DATA
 # =========================================================
 
+# =========================================================
+# LOAD DATA
+# =========================================================
+
 @st.cache_data
 def load_demo_data():
 
-    return pd.read_csv(
-        PROJECT_DIR / "creditcard_clean.csv"
+    demo_path = (
+        PROJECT_DIR
+        / "assets"
+        / "demo_transactions.csv"
     )
+
+    return pd.read_csv(demo_path)
 
 
 df = load_demo_data()
