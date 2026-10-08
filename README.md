@@ -26,23 +26,27 @@ Instead of treating fraud detection as a simple binary classification task, the 
 
 The main objective is to demonstrate how a fraud detection system can go beyond predictive performance by also providing **interpretability, uncertainty awareness, and human oversight**.
 
----
+## Live Application
+
+Explore the deployed interactive application:
+
+## [**Launch the Trustworthy Financial Fraud Detection App**](https://trustworthy-fraud-detection.streamlit.app)
 
 ## Key Results
 
 ### Final Held-Out Test Performance
 
-| Metric | Result |
-|---|---:|
-| Precision | **90.91%** |
-| Recall | **84.51%** |
-| F1 Score | **87.59%** |
-| ROC-AUC | **0.985** |
-| PR-AUC | **0.887** |
-| True Positives | **60** |
-| False Negatives | **11** |
-| False Positives | **6** |
-| True Negatives | **42,483** |
+| Metric          |     Result |
+| --------------- | ---------: |
+| Precision       | **90.91%** |
+| Recall          | **84.51%** |
+| F1 Score        | **87.59%** |
+| ROC-AUC         |  **0.985** |
+| PR-AUC          |  **0.887** |
+| True Positives  |     **60** |
+| False Negatives |     **11** |
+| False Positives |      **6** |
+| True Negatives  | **42,483** |
 
 The final model detected **60 of 71 fraudulent transactions** in the held-out test set while producing only **6 false-positive alerts** among **42,489 legitimate transactions**.
 
@@ -50,13 +54,13 @@ Because the dataset is extremely imbalanced, the project emphasizes **precision,
 
 ### 95% Bootstrap Confidence Intervals
 
-| Metric | Estimate | 95% CI |
-|---|---:|---:|
-| Precision | 0.909 | 0.836 – 0.972 |
-| Recall | 0.845 | 0.755 – 0.923 |
-| F1 Score | 0.876 | 0.812 – 0.932 |
-| ROC-AUC | 0.985 | 0.967 – 0.998 |
-| PR-AUC | 0.887 | 0.812 – 0.948 |
+| Metric    | Estimate |        95% CI |
+| --------- | -------: | ------------: |
+| Precision |    0.909 | 0.836 – 0.972 |
+| Recall    |    0.845 | 0.755 – 0.923 |
+| F1 Score  |    0.876 | 0.812 – 0.932 |
+| ROC-AUC   |    0.985 | 0.967 – 0.998 |
+| PR-AUC    |    0.887 | 0.812 – 0.948 |
 
 These intervals were estimated using **2,000 bootstrap resamples** of the final test predictions.
 
@@ -91,17 +95,16 @@ The deployed application uses a small demonstration subset stored in `assets/dem
 
 The variables `V1–V28` are anonymized transformed features. They are therefore treated as statistical inputs and are **not assigned unsupported real-world financial meanings**.
 
-
 ## Research Design
 
 The project uses a four-way stratified split:
 
-| Split | Transactions | Fraud |
-|---|---:|---:|
-| Training | 170,235 | 284 |
-| Validation | 42,559 | 71 |
-| Calibration | 28,372 | 47 |
-| Test | 42,560 | 71 |
+| Split       | Transactions | Fraud |
+| ----------- | -----------: | ----: |
+| Training    |      170,235 |   284 |
+| Validation  |       42,559 |    71 |
+| Calibration |       28,372 |    47 |
+| Test        |       42,560 |    71 |
 
 This separation supports distinct stages for:
 
@@ -126,11 +129,11 @@ Three primary model families were evaluated:
 
 The main validation results were approximately:
 
-| Model | Precision | Recall | F1 | PR-AUC |
-|---|---:|---:|---:|---:|
-| Logistic Regression | 0.852 | 0.732 | 0.788 | 0.677 |
-| Random Forest | 0.930 | 0.746 | 0.828 | 0.775 |
-| XGBoost | 0.900 | 0.761 | 0.824 | 0.762 |
+| Model               | Precision | Recall |    F1 | PR-AUC |
+| ------------------- | --------: | -----: | ----: | -----: |
+| Logistic Regression |     0.852 |  0.732 | 0.788 |  0.677 |
+| Random Forest       |     0.930 |  0.746 | 0.828 |  0.775 |
+| XGBoost             |     0.900 |  0.761 | 0.824 |  0.762 |
 
 Random Forest achieved the strongest validation PR-AUC and F1, but it also showed a larger train-validation performance gap.
 
@@ -202,15 +205,15 @@ alpha = 0.10
 
 At this operating point:
 
-| Measure | Result |
-|---|---:|
-| Target Coverage | 90% |
+| Measure                    |     Result |
+| -------------------------- | ---------: |
+| Target Coverage            |        90% |
 | Empirical Overall Coverage | **90.30%** |
-| Normal-Class Coverage | **90.32%** |
-| Fraud-Class Coverage | **76.06%** |
-| Human Review Rate | **9.69%** |
-| Confident Fraud Decisions | **55** |
-| Confident Fraud Precision | **98.18%** |
+| Normal-Class Coverage      | **90.32%** |
+| Fraud-Class Coverage       | **76.06%** |
+| Human Review Rate          |  **9.69%** |
+| Confident Fraud Decisions  |     **55** |
+| Confident Fraud Precision  | **98.18%** |
 
 Instead of forcing every transaction into an automated binary decision, the system can return:
 
@@ -229,10 +232,10 @@ This abstention mechanism is a central part of the trustworthy-AI design.
 The project also evaluates multiple significance levels to study the trade-off between coverage and review workload.
 
 | Alpha | Target Coverage | Overall Coverage | Fraud Coverage | Human Review Rate |
-|---|---:|---:|---:|---:|
-| 0.05 | 95% | 95.21% | 80.28% | 4.77% |
-| 0.10 | 90% | 90.30% | 76.06% | 9.69% |
-| 0.20 | 80% | 79.67% | 71.83% | 20.33% |
+| ----- | --------------: | ---------------: | -------------: | ----------------: |
+| 0.05  |             95% |           95.21% |         80.28% |             4.77% |
+| 0.10  |             90% |           90.30% |         76.06% |             9.69% |
+| 0.20  |             80% |           79.67% |         71.83% |            20.33% |
 
 The primary setting remains **alpha = 0.10** because it was pre-specified rather than selected from test performance.
 
