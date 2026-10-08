@@ -64,21 +64,15 @@ These intervals were estimated using **2,000 bootstrap resamples** of the final 
 
 ## Dataset
 
-The project uses the public **Credit Card Fraud Detection** dataset commonly distributed through Kaggle and associated with European cardholder transactions.
+The project uses a public credit-card fraud detection dataset containing European cardholder transactions.
+
+The full dataset is not included in this repository because of its size.
 
 ### Dataset Source
 
-The full dataset is available from Kaggle:
+[Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud/data)
 
-[Credit Card Fraud Detection Dataset — Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud/data)
-
-The full raw dataset is intentionally **not stored in this GitHub repository** because of its size. The deployed application instead uses a small demonstration subset stored in:
-
-```text
-assets/demo_transactions.csv
-```
-
-The research results reported in this repository were produced using the **full dataset**, not the small demo subset.
+The deployed application uses a small demonstration subset stored in `assets/demo_transactions.csv`, while the research results were produced using the full dataset.
 
 ### Original Dataset
 
@@ -97,7 +91,6 @@ The research results reported in this repository were produced using the **full 
 
 The variables `V1–V28` are anonymized transformed features. They are therefore treated as statistical inputs and are **not assigned unsupported real-world financial meanings**.
 
----
 
 ## Research Design
 
