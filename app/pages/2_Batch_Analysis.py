@@ -312,7 +312,7 @@ if use_demo:
     def load_demo():
 
         full_df = pd.read_csv(
-            PROJECT_DIR / "creditcard_clean.csv"
+            PROJECT_DIR / "assets" / "demo_transactions.csv"
         )
 
         demo = pd.concat([
@@ -333,10 +333,11 @@ if use_demo:
         ]).sample(
             frac=1,
             random_state=42
-        ).reset_index(drop=True)
+        ).reset_index(
+            drop=True
+        )
 
         return demo
-
 
     input_df = load_demo()
 
