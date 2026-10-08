@@ -1,0 +1,18 @@
+Metric,Value
+Test Accuracy,0.9996005639097745
+Test Precision,0.9090909090909091
+Test Recall,0.8450704225352113
+Test F1,0.8759124087591241
+Test ROC-AUC,0.9847247953820029
+Test PR-AUC,0.8867941115140305
+True Negatives,42483.0
+False Positives,6.0
+False Negatives,11.0
+True Positives,60.0
+Conformal Target Coverage (alpha=0.10),0.9
+Conformal Overall Coverage,0.902984022556391
+Conformal Normal Coverage,0.9032220104026925
+Conformal Fraud Coverage,0.7605633802816901
+Conformal Human Review Rate,0.096921992481203
+Conformal Confident Accuracy,0.9998959281904514
+Confident Fraud Precision,0.9818181818181818
