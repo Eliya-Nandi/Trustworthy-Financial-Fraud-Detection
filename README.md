@@ -12,17 +12,19 @@
 
 ---
 
-## Overview
+## Project Overview
 
-This project develops an end-to-end **trustworthy machine learning pipeline for credit-card fraud detection**. Rather than treating fraud detection as a simple binary classification problem, the system combines:
+This project presents an end-to-end **trustworthy machine learning pipeline for credit-card fraud detection**.
 
-- **XGBoost** for fraud risk prediction
-- **SHAP** for model explainability
+Instead of treating fraud detection as a simple binary classification task, the system combines:
+
+- **XGBoost** for fraud-risk prediction
+- **SHAP** for global and local model explainability
 - **Conformal prediction** for uncertainty-aware decisions
 - **Human-in-the-loop review** for ambiguous transactions
-- **Streamlit** for an interactive decision-support interface
+- **Streamlit** for an interactive decision-support application
 
-The goal is to demonstrate how a fraud detection system can go beyond predictive accuracy by also providing **interpretability, uncertainty awareness, and human oversight**.
+The main objective is to demonstrate how a fraud detection system can go beyond predictive performance by also providing **interpretability, uncertainty awareness, and human oversight**.
 
 ---
 
@@ -30,39 +32,55 @@ The goal is to demonstrate how a fraud detection system can go beyond predictive
 
 ### Final Held-Out Test Performance
 
-| Metric          |     Result |
-| --------------- | ---------: |
-| Precision       | **90.91%** |
-| Recall          | **84.51%** |
-| F1 Score        | **87.59%** |
-| ROC-AUC         |  **0.985** |
-| PR-AUC          |  **0.887** |
-| True Positives  |     **60** |
-| False Negatives |     **11** |
-| False Positives |      **6** |
-| True Negatives  | **42,483** |
+| Metric | Result |
+|---|---:|
+| Precision | **90.91%** |
+| Recall | **84.51%** |
+| F1 Score | **87.59%** |
+| ROC-AUC | **0.985** |
+| PR-AUC | **0.887** |
+| True Positives | **60** |
+| False Negatives | **11** |
+| False Positives | **6** |
+| True Negatives | **42,483** |
 
-The model detected **60 of 71 fraudulent transactions** in the held-out test set while producing only **6 false-positive alerts** among 42,489 legitimate transactions.
+The final model detected **60 of 71 fraudulent transactions** in the held-out test set while producing only **6 false-positive alerts** among **42,489 legitimate transactions**.
 
-Because the dataset is extremely imbalanced, **precision, recall, F1 score, and PR-AUC** are emphasized over accuracy.
+Because the dataset is extremely imbalanced, the project emphasizes **precision, recall, F1 score, and PR-AUC** over accuracy.
 
 ### 95% Bootstrap Confidence Intervals
 
-| Metric    | Estimate |        95% CI |
-| --------- | -------: | ------------: |
-| Precision |    0.909 | 0.836 – 0.972 |
-| Recall    |    0.845 | 0.755 – 0.923 |
-| F1 Score  |    0.876 | 0.812 – 0.932 |
-| ROC-AUC   |    0.985 | 0.967 – 0.998 |
-| PR-AUC    |    0.887 | 0.812 – 0.948 |
+| Metric | Estimate | 95% CI |
+|---|---:|---:|
+| Precision | 0.909 | 0.836 – 0.972 |
+| Recall | 0.845 | 0.755 – 0.923 |
+| F1 Score | 0.876 | 0.812 – 0.932 |
+| ROC-AUC | 0.985 | 0.967 – 0.998 |
+| PR-AUC | 0.887 | 0.812 – 0.948 |
+
+These intervals were estimated using **2,000 bootstrap resamples** of the final test predictions.
 
 ---
 
 ## Dataset
 
-The project uses the public **credit-card fraud detection dataset** commonly distributed through Kaggle and originally associated with European cardholder transactions.
+The project uses the public **Credit Card Fraud Detection** dataset commonly distributed through Kaggle and associated with European cardholder transactions.
 
-### Original dataset
+### Dataset Source
+
+The full dataset is available from Kaggle:
+
+[Credit Card Fraud Detection Dataset — Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud/data)
+
+The full raw dataset is intentionally **not stored in this GitHub repository** because of its size. The deployed application instead uses a small demonstration subset stored in:
+
+```text
+assets/demo_transactions.csv
+```
+
+The research results reported in this repository were produced using the **full dataset**, not the small demo subset.
+
+### Original Dataset
 
 - **284,807 transactions**
 - **492 fraudulent transactions**
@@ -70,7 +88,7 @@ The project uses the public **credit-card fraud detection dataset** commonly dis
 - Features: `Time`, `V1–V28`, `Amount`, and `Class`
 - No missing values
 
-### After preprocessing
+### After Preprocessing
 
 - **283,726 transactions**
 - **473 fraudulent transactions**
@@ -79,20 +97,18 @@ The project uses the public **credit-card fraud detection dataset** commonly dis
 
 The variables `V1–V28` are anonymized transformed features. They are therefore treated as statistical inputs and are **not assigned unsupported real-world financial meanings**.
 
-The full raw dataset is intentionally **not included in this repository**. A small demonstration dataset is provided only for the deployed portfolio application.
-
 ---
 
-## Research Workflow
+## Research Design
 
-The project follows a four-way stratified split:
+The project uses a four-way stratified split:
 
-| Split       | Transactions | Fraud |
-| ----------- | -----------: | ----: |
-| Training    |      170,235 |   284 |
-| Validation  |       42,559 |    71 |
-| Calibration |       28,372 |    47 |
-| Test        |       42,560 |    71 |
+| Split | Transactions | Fraud |
+|---|---:|---:|
+| Training | 170,235 | 284 |
+| Validation | 42,559 | 71 |
+| Calibration | 28,372 | 47 |
+| Test | 42,560 | 71 |
 
 This separation supports distinct stages for:
 
@@ -101,7 +117,7 @@ This separation supports distinct stages for:
 3. conformal calibration
 4. final held-out evaluation
 
-The test set was reserved for final evaluation.
+The test set was reserved for final evaluation and was not used for model or threshold selection.
 
 ---
 
@@ -113,7 +129,19 @@ Three primary model families were evaluated:
 - Random Forest
 - XGBoost
 
-Random Forest achieved strong validation performance, but the original XGBoost configuration was retained as the **primary research model** because it provided a strong overall balance of:
+### Validation Summary
+
+The main validation results were approximately:
+
+| Model | Precision | Recall | F1 | PR-AUC |
+|---|---:|---:|---:|---:|
+| Logistic Regression | 0.852 | 0.732 | 0.788 | 0.677 |
+| Random Forest | 0.930 | 0.746 | 0.828 | 0.775 |
+| XGBoost | 0.900 | 0.761 | 0.824 | 0.762 |
+
+Random Forest achieved the strongest validation PR-AUC and F1, but it also showed a larger train-validation performance gap.
+
+The original XGBoost model was retained as the **primary research model** because it provided a strong overall balance of:
 
 - fraud recall
 - F1 score
@@ -122,7 +150,13 @@ Random Forest achieved strong validation performance, but the original XGBoost c
 - generalization behavior
 - compatibility with the explainability and uncertainty pipeline
 
-The selected decision threshold was determined using validation data rather than the final test set.
+The selected XGBoost decision threshold was approximately:
+
+```text
+0.8905
+```
+
+This threshold was selected using validation data rather than the final test set.
 
 ---
 
@@ -130,47 +164,62 @@ The selected decision threshold was determined using validation data rather than
 
 SHAP is used at both **global** and **local** levels.
 
-### Global explanation
+### Global Explainability
 
-Global SHAP analysis identifies which anonymized model features contribute most strongly across the validation sample.
+Global SHAP analysis identifies which anonymized features contribute most strongly across the validation sample.
 
 The most influential features included:
 
 `V14`, `V4`, `V12`, `V3`, `V11`, `V10`, `V15`, `V19`, `V26`, and `V8`.
 
-### Local explanation
+### Local Explainability
 
 For individual transactions, the application shows:
 
 - features pushing the prediction toward **fraud**
 - features pushing the prediction toward **legitimate**
-- relative contribution strength
+- the relative magnitude of those contributions
 
-This provides analysts with an interpretable explanation for each model decision while avoiding unsupported semantic claims about anonymized PCA-derived variables.
+This provides analysts with an interpretable explanation for each model decision while avoiding unsupported semantic interpretations of the anonymized PCA-derived variables.
+
+---
+
+## Probability Calibration
+
+The selected XGBoost model was also evaluated for probability calibration.
+
+Key calibration results:
+
+- **Brier Score:** approximately `0.00129`
+- **Expected Calibration Error (10 bins):** approximately `0.00434`
+
+These aggregate values are low, but they are interpreted cautiously because the dataset is dominated by legitimate transactions.
 
 ---
 
 ## Uncertainty-Aware Decisions with Conformal Prediction
 
-The project adds a **marginal conformal prediction layer** on top of the XGBoost fraud probabilities.
+The project adds a **marginal conformal prediction layer** on top of XGBoost fraud probabilities.
 
 Primary significance level:
 
-`alpha = 0.10`
+```text
+alpha = 0.10
+```
 
 At this operating point:
 
-| Measure                    |     Result |
-| -------------------------- | ---------: |
-| Target Coverage            |        90% |
+| Measure | Result |
+|---|---:|
+| Target Coverage | 90% |
 | Empirical Overall Coverage | **90.30%** |
-| Normal-Class Coverage      | **90.32%** |
-| Fraud-Class Coverage       | **76.06%** |
-| Human Review Rate          |  **9.69%** |
-| Confident Fraud Decisions  |     **55** |
-| Confident Fraud Precision  | **98.18%** |
+| Normal-Class Coverage | **90.32%** |
+| Fraud-Class Coverage | **76.06%** |
+| Human Review Rate | **9.69%** |
+| Confident Fraud Decisions | **55** |
+| Confident Fraud Precision | **98.18%** |
 
-Instead of forcing every transaction into an automated binary decision, the system can produce:
+Instead of forcing every transaction into an automated binary decision, the system can return:
 
 - **Confident Normal**
 - **Confident Fraud**
@@ -179,6 +228,20 @@ Instead of forcing every transaction into an automated binary decision, the syst
 Transactions without a sufficiently supported singleton prediction set are routed to human review.
 
 This abstention mechanism is a central part of the trustworthy-AI design.
+
+---
+
+## Conformal Sensitivity
+
+The project also evaluates multiple significance levels to study the trade-off between coverage and review workload.
+
+| Alpha | Target Coverage | Overall Coverage | Fraud Coverage | Human Review Rate |
+|---|---:|---:|---:|---:|
+| 0.05 | 95% | 95.21% | 80.28% | 4.77% |
+| 0.10 | 90% | 90.30% | 76.06% | 9.69% |
+| 0.20 | 80% | 79.67% | 71.83% | 20.33% |
+
+The primary setting remains **alpha = 0.10** because it was pre-specified rather than selected from test performance.
 
 ---
 
@@ -202,53 +265,107 @@ The analyst can then record one of three decisions:
 - Confirm Fraud
 - Escalate for Further Investigation
 
-This demonstrates how model uncertainty can be integrated into a practical decision-support workflow rather than hidden from the user.
+This demonstrates how model uncertainty can be integrated into a practical decision-support workflow instead of being hidden from the user.
 
 ---
 
-## Interactive Application
+## Interactive Streamlit Application
 
-The Streamlit application contains five focused sections:
+The application contains five focused sections.
 
-### Home
+### 1. Home
 
-Executive overview of the trustworthy fraud detection system and core research results.
+Provides an executive overview of:
 
-### Transaction Analyzer
+- core research results
+- selected model
+- final performance
+- explainability
+- uncertainty-aware decision routing
 
-Analyze a single transaction using:
+### 2. Transaction Analyzer
+
+Analyzes a single transaction using:
 
 - fraud probability
-- optimized threshold
+- selected decision threshold
 - conformal prediction
 - local SHAP explanation
 - recommended action
 
-### Batch Analysis
+### 3. Batch Analysis
 
-Upload a compatible CSV file and perform batch fraud screening.
+Allows users to upload a compatible CSV file and perform batch fraud screening.
 
 Expected model features:
 
-`Time`, `V1–V28`, `Amount`
+```text
+Time
+V1
+V2
+...
+V28
+Amount
+```
 
 The `Class` column is optional.
 
-### Human Review Queue
+The page returns:
 
-Investigate transactions that the conformal layer routes to manual review.
+- fraud probabilities
+- model predictions
+- conformal decisions
+- review recommendations
+- portfolio-level charts
+- downloadable screening results
 
-### Model Performance
+### 4. Human Review Queue
 
-Explore:
+Supports investigation of transactions that the conformal layer routes to manual review.
+
+The review queue includes:
+
+- priority ranking
+- transaction details
+- fraud risk
+- local SHAP explanations
+- analyst notes and decisions
+
+### 5. Model Performance
+
+Provides a research-oriented evaluation view containing:
 
 - model benchmarking
 - confusion matrix
-- ROC and precision-recall curves
+- ROC curve
+- precision-recall curve
 - bootstrap confidence intervals
 - global SHAP importance
-- probability calibration
-- conformal sensitivity
+- calibration diagnostics
+- conformal sensitivity analysis
+
+---
+
+## Demo Data
+
+The repository includes:
+
+```text
+assets/demo_transactions.csv
+```
+
+This file exists only to support the interactive portfolio application.
+
+It is intentionally enriched with legitimate and fraudulent examples so that the app can demonstrate:
+
+- fraud detection
+- confident fraud decisions
+- confident normal decisions
+- human review routing
+
+The demo file **does not reproduce the true fraud prevalence of the original dataset** and should not be interpreted as a representative sample of real transaction traffic.
+
+The scientific evaluation results in this repository are based on the full dataset from Kaggle.
 
 ---
 
@@ -267,7 +384,7 @@ Trustworthy-Financial-Fraud-Detection/
 │
 ├── assets/
 │   ├── demo_transactions.csv
-│   └── trustworthy_financial_fraud_detection_dashboard.png
+│   └── trustworthy_financial_fraud_detection.png
 │
 ├── figures/
 ├── models/
@@ -304,7 +421,7 @@ cd Trustworthy-Financial-Fraud-Detection
 pip install -r requirements.txt
 ```
 
-### 3. Start Streamlit
+### 3. Start the Streamlit application
 
 ```bash
 streamlit run app/Home.py
@@ -314,29 +431,13 @@ The application will open in your browser.
 
 ---
 
-## Demo Data
-
-The repository includes:
-
-```text
-assets/demo_transactions.csv
-```
-
-This dataset is intentionally enriched with legitimate and fraudulent examples so that the application can demonstrate all parts of the workflow.
-
-It **does not reproduce the true fraud prevalence of the original dataset** and should not be interpreted as a representative population sample.
-
-The scientific model evaluation reported in this repository is based on the original full research dataset and the predefined held-out test split.
-
----
-
 ## Limitations & Responsible Use
 
 This project is a **research and portfolio demonstration** and is not intended for autonomous production financial decision-making.
 
 Important limitations include:
 
-- the dataset is highly imbalanced
+- the dataset is extremely imbalanced
 - `V1–V28` are anonymized transformed features with no supported real-world semantic interpretation
 - the dataset represents a specific historical transaction environment and may not generalize to other institutions, regions, customer populations, or fraud patterns
 - model probabilities and conformal prediction sets depend on the data-generating distribution remaining sufficiently stable
@@ -347,13 +448,35 @@ Important limitations include:
 In a real financial deployment, this type of model should be combined with:
 
 - institution-specific validation
-- continuous monitoring
-- drift detection
+- continuous performance monitoring
+- data and concept drift detection
 - governance and audit procedures
 - human review for uncertain or high-impact decisions
-- appropriate privacy, security, legal, and regulatory controls
+- privacy, security, legal, and regulatory controls
+- retraining and recalibration when operating conditions change
 
-The application is therefore presented as a **decision-support research prototype**, not an autonomous fraud adjudication system.
+The application should therefore be understood as a **decision-support research prototype**, not an autonomous fraud adjudication system.
+
+---
+
+## Reproducibility
+
+The repository includes:
+
+- the research notebook
+- final model artifacts
+- research figures
+- final evaluation tables
+- application source code
+- a deployment-safe demo dataset
+
+To fully reproduce the research from the original data, download the dataset from Kaggle:
+
+[https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud/data](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud/data)
+
+Then place the dataset locally according to the notebook workflow.
+
+The large raw dataset is intentionally excluded from version control.
 
 ---
 
@@ -369,7 +492,8 @@ The application is therefore presented as a **decision-support research prototyp
 - **Plotly**
 - **Streamlit**
 - **Matplotlib**
-- **Git / GitHub**
+- **Git**
+- **GitHub**
 
 ---
 
