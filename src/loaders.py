@@ -12,11 +12,23 @@ FIGURES_DIR = PROJECT_DIR / "figures"
 
 def load_model():
     model_path = MODELS_DIR / "final_xgboost_model.pkl"
+
+    if not model_path.exists():
+        raise FileNotFoundError(
+            f"Model file not found. Expected path: {model_path}"
+        )
+
     return joblib.load(model_path)
 
 
 def load_configuration():
     config_path = MODELS_DIR / "final_research_configuration.pkl"
+
+    if not config_path.exists():
+        raise FileNotFoundError(
+            f"Configuration file not found. Expected path: {config_path}"
+        )
+
     return joblib.load(config_path)
 
 
